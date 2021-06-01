@@ -1,1 +1,1 @@
-# CMPS3360
+# CMPS3360 Homework
