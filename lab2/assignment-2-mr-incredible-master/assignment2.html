@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assignment 2</title>
+</head>
+<body>
+
+<h3>CMPS-3360 Assignment 2</h3>
+<span>Taoyu Yang, Adam Silver</span>
+
+<br/>
+<hr/>
+<br/>
+
+<br/>
+
+<script src="scores.js" charset="utf-8"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>   
+<script type="text/javascript" src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+
+<!-- Rectangles hard-coded below are placeholders.  Remove. -->
+
+<div id="D3Scatter1">	 
+    <h2>1. Reproduce Scatter Plot in D3</h2>
+    <svg id="D3ScatterSVG" width="300" height="200">
+      <rect x="0" y="0" width="300" height="200" style="fill:white; stroke:black; stroke-width:1px"/>
+	  
+    </svg>
+	
+	<script>
+		var svg = d3.select("#D3ScatterSVG")	
+		var selection = svg.selectAll("circle")
+               .data(scores)
+
+		selection.enter().append("circle")
+				.attr("cx",function(d,i) { return 30 + d.SATM/4})
+				.attr("cy",function(d,i) { return 230-d.SATV/4})
+				.attr("r",function(d,i) { return d.ACT/10})
+				.style("fill",function(d,i){ return "rgb(0," + String(375-d.GPA/4*256) + ",0)"} )
+		
+		var x = d3.scaleLinear()
+		.domain([0,800])
+		.range([0,200])
+		
+		var xAxis = g => g
+		.attr("transform", "translate(30,180)")
+		.call(d3.axisBottom(x))
+		
+		svg.append("g")
+		.call(xAxis);
+		
+		var y = d3.scaleLinear()
+		.domain([0,800])
+		.range([150,0])
+		
+		var yAxis = g => g
+		.attr("transform", "translate(30,30)")
+		.call(d3.axisLeft(y))
+		
+		svg.append("g")
+		.call(yAxis);
+
+	</script>
+		 
+</div>
+
+<div id="D3Scatter2">
+    <h2>2-4. Color</h2>
+    <svg id="linearColor" width="300" height="200">
+       <rect x="0" y="0" width="300" height="200" style="fill:white; stroke:black; stroke-width:1px"/>
+    </svg>
+	<script>
+		var GPA1 = []
+		for (k=0;k<scores.length;k++){
+			GPA1.push(scores[k].GPA)
+		}
+		var svg = d3.select("#linearColor")	
+
+		var color = d3.scale.linear()
+                .domain([d3.min(GPA1), d3.max(GPA1)])
+                .range(["red", "green"]);
+				
+		var selection = svg.selectAll("circle")
+               .data(scores)
+
+		selection.enter().append("circle")
+				.attr("cx",function(d,i) { return 30+d.SATM/4})
+				.attr("cy",function(d,i) { return 230-d.SATV/4})
+				.attr("r",function(d,i) { return d.ACT/10})
+				.style("fill", function (d){
+                    // here we apply the color scale
+                    return color(d.GPA);
+                })
+
+		
+		var x = d3.scaleLinear()
+		.domain([0,800])
+		.range([0,200])
+		
+		var xAxis = g => g
+		.attr("transform", "translate(30,180)")
+		.call(d3.axisBottom(x))
+		
+		svg.append("g")
+		.call(xAxis);
+		
+		var y = d3.scaleLinear()
+		.domain([0,800])
+		.range([150,0])
+		
+		var yAxis = g => g
+		.attr("transform", "translate(30,30)")
+		.call(d3.axisLeft(y))
+		
+		svg.append("g")
+		.call(yAxis);	
+	</script>
+	
+    <svg id="continuousColorScale" width="300" height="200">
+       <rect x="0" y="0" width="300" height="200" style="fill:white; stroke:black; stroke-width:1px"/>
+    </svg>
+		<script>
+		var GPA1 = []
+		for (k=0;k<scores.length;k++){
+			GPA1.push(scores[k].GPA)
+		}
+		var svg = d3.select("#continuousColorScale")	
+
+		var color = d3.scale.linear()
+                  .domain([d3.min(GPA1),d3.mean(GPA1), d3.max(GPA1)])
+				  .range(["rgb(240,249,232)", "rgb(67,162,202)", "rgb(8,104,172)"])
+				
+		var selection = svg.selectAll("circle")
+               .data(scores)
+
+		selection.enter().append("circle")
+				.attr("cx",function(d,i) { return 30 + d.SATM/4})
+				.attr("cy",function(d,i) { return 230-d.SATV/4})
+				.attr("r",function(d,i) { return d.ACT/10})
+				.style("fill", function (d){
+                    // here we apply the color scale
+                    return color(d.GPA);
+                })
+				
+		var x = d3.scaleLinear()
+		.domain([0,800])
+		.range([0,200])
+		
+		var xAxis = g => g
+		.attr("transform", "translate(30,180)")
+		.call(d3.axisBottom(x))
+		
+		svg.append("g")
+		.call(xAxis);
+		
+		var y = d3.scaleLinear()
+		.domain([0,800])
+		.range([150,0])
+		
+		var yAxis = g => g
+		.attr("transform", "translate(30,30)")
+		.call(d3.axisLeft(y))
+		
+		svg.append("g")
+		.call(yAxis);
+	</script>
+    <svg id="quantizedColor" width="300" height="200">
+       <rect x="0" y="0" width="300" height="200" style="fill:white; stroke:black; stroke-width:1px"/>
+    </svg>
+	<script>
+		var GPA1 = []
+		for (k=0;k<scores.length;k++){
+			GPA1.push(scores[k].GPA)
+		}
+		var svg = d3.select("#quantizedColor")	
+		
+		var color = d3.scaleQuantize()
+		.domain([d3.min(GPA1), d3.max(GPA1)])
+		.range(["rgb(240,249,232)", "rgb(186,228,188)","rgb(123,204,196)", "rgb(67,162,202)", "rgb(8,104,172)"]);
+					
+		var selection = svg.selectAll("circle")
+               .data(scores)
+
+		selection.enter().append("circle")
+				.attr("cx",function(d,i) { return 30 + d.SATM/4})
+				.attr("cy",function(d,i) { return 230-d.SATV/4})
+				.attr("r",function(d,i) { return d.ACT/10})
+				.style("fill", function (d){
+                    // here we apply the color scale
+                    return color(d.GPA);
+                })
+				
+		var x = d3.scaleLinear()
+		.domain([0,800])
+		.range([0,200])
+		
+		var xAxis = g => g
+		.attr("transform", "translate(30,180)")
+		.call(d3.axisBottom(x))
+		
+		svg.append("g")
+		.call(xAxis);
+		
+		var y = d3.scaleLinear()
+		.domain([0,800])
+		.range([150,0])
+		
+		var yAxis = g => g
+		.attr("transform", "translate(30,30)")
+		.call(d3.axisLeft(y))
+		
+		svg.append("g")
+		.call(yAxis);
+	</script>
+</div>
+
+<button type="button" onclick="setLinear()" >Linear</button>
+<script>
+		var setLinear = function() {
+			var GPA1 = []
+			for (k=0;k<scores.length;k++){
+				GPA1.push(scores[k].GPA)
+			}
+			var graph1Svg = d3.select("#linearColor")	
+			var graph2Svg = d3.select("#continuousColorScale")
+			var graph3Svg = d3.select("#quantizedColor")
+			
+			var color = d3.scale.linear()
+                .domain([d3.min(GPA1), d3.max(GPA1)])
+                .range(["red", "green"]);
+				
+			var graph1 = graph1Svg.selectAll("circle")
+               .data(scores)
+			var graph2 = graph2Svg.selectAll("circle")
+               .data(scores)
+			var graph3 = graph3Svg.selectAll("circle")
+               .data(scores)
+			
+			graph1
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+			graph2
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+			graph3
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+		}
+</script>
+
+<button type="button" onclick="setCont()" >Continuous</button>
+<script>
+		var setCont = function() {
+		
+			var GPA1 = []
+			for (k=0;k<scores.length;k++){
+				GPA1.push(scores[k].GPA)
+			}
+			var graph1Svg = d3.select("#linearColor")	
+			var graph2Svg = d3.select("#continuousColorScale")
+			var graph3Svg = d3.select("#quantizedColor")
+			
+			var color = d3.scale.linear()
+              .domain([d3.min(GPA1),d3.mean(GPA1), d3.max(GPA1)])
+			  .range(["rgb(240,249,232)", "rgb(67,162,202)", "rgb(8,104,172)"])
+				
+			var graph1 = graph1Svg.selectAll("circle")
+               .data(scores)
+			var graph2 = graph2Svg.selectAll("circle")
+               .data(scores)
+			var graph3 = graph3Svg.selectAll("circle")
+               .data(scores)
+			
+			graph1
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+			graph2
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+			graph3
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+		}
+</script>
+
+<button type="button" onclick="setQuant()" >Quantized</button>
+<script>
+		var setQuant = function() {
+		
+			var GPA1 = []
+			for (k=0;k<scores.length;k++){
+				GPA1.push(scores[k].GPA)
+			}
+			var graph1Svg = d3.select("#linearColor")	
+			var graph2Svg = d3.select("#continuousColorScale")
+			var graph3Svg = d3.select("#quantizedColor")
+			
+			var color = d3.scaleQuantize()
+			.domain([d3.min(GPA1), d3.max(GPA1)])
+			.range(["rgb(240,249,232)", "rgb(186,228,188)","rgb(123,204,196)", "rgb(67,162,202)", "rgb(8,104,172)"]);
+				
+			var graph1 = graph1Svg.selectAll("circle")
+               .data(scores)
+			var graph2 = graph2Svg.selectAll("circle")
+               .data(scores)
+			var graph3 = graph3Svg.selectAll("circle")
+               .data(scores)
+			
+			graph1
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+			graph2
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+			graph3
+				.transition()
+                .duration(1000)
+				.style("fill", function (d){
+                    return color(d.GPA);
+                })
+		}
+</script>
+
+<button type="button" onclick="setSAT()" >Cumulative SAT</button>
+<script>
+		var setSAT = function() {
+		
+			var GPA1 = []
+			for (k=0;k<scores.length;k++){
+				GPA1.push(scores[k].GPA)
+			}
+			var graph1Svg = d3.select("#linearColor")	
+			var graph2Svg = d3.select("#continuousColorScale")
+			var graph3Svg = d3.select("#quantizedColor")
+				
+			var graph1 = graph1Svg.selectAll("circle")
+               .data(scores)
+			var graph2 = graph2Svg.selectAll("circle")
+               .data(scores)
+			var graph3 = graph3Svg.selectAll("circle")
+               .data(scores)
+			
+			graph1
+				.transition()
+                .duration(1000)
+				.attr("cx",function(d,i) { return 30 + d.SATM/8+d.SATV/8})
+
+			graph2
+				.transition()
+                .duration(1000)
+				.attr("cx",function(d,i) { return 30 + d.SATM/8+d.SATV/8})
+
+			graph3
+				.transition()
+                .duration(1000)
+				.attr("cx",function(d,i) { return 30 + d.SATM/8+d.SATV/8})
+				
+			var x = d3.scaleLinear()
+				.domain([0,1600])
+				.range([0,200])
+
+			graph1Svg.select("g")
+				.transition()
+                .duration(1000)
+				.call(d3.axisBottom(x))
+			graph2Svg.select("g")
+				.transition()
+                .duration(1000)
+				.call(d3.axisBottom(x))
+			graph3Svg.select("g")
+				.transition()
+                .duration(1000)
+				.call(d3.axisBottom(x))
+		}
+		
+</script>
+</body>
+</html>

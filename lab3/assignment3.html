@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assignment 3</title>
+</head>
+<body>
+
+<h3>CMPS-3360 Assignment 3</h3>
+<span>Team: Mr.Incredible Teammate: Jingzhi Yang Yuyuan Kang</span>
+
+<br/>
+<hr/>
+<br/>
+
+<br/>
+<script src="https://d3js.org/d3.v4.js" charset="utf-8"></script>
+<script src="https://d3js.org/d3-color.v2.min.js"></script>
+<script src="https://d3js.org/d3-dispatch.v2.min.js"></script>
+<script src="https://d3js.org/d3-ease.v2.min.js"></script>
+<script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
+<script src="https://d3js.org/d3-timer.v2.min.js"></script>
+<script src="https://d3js.org/d3-selection.v2.min.js"></script>
+<script src="https://d3js.org/d3-transition.v2.min.js"></script>
+<script src="https://d3js.org/d3-drag.v2.min.js"></script>
+<script src="https://d3js.org/d3-brush.v2.min.js"></script>
+<script src="scores.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+<script type="text/javascript"
+    src="https://d3js.org/d3.v4.min.js" charset="utf-8">
+</script>
+
+
+<!-- Rectangles hard-coded below are placeholders.  Remove. -->
+
+<div id="D3Scatter1">	 
+    <h2>1. Linked Scatter Plot</h2>
+    <svg id="A1" width="300" height="200">
+      <rect x="0" y="0" width="300" height="200" style="fill:white; stroke:black; stroke-width:1px"/>
+    </svg>
+    <svg id="A2" width="300" height="200">
+      <rect x="0" y="0" width="300" height="200" style="fill:white; stroke:black; stroke-width:1px"/>
+    </svg>
+    <svg id="A3" width="300" height="200">
+      <rect x="0" y="0" width="300" height="200" style="fill:white; stroke:black; stroke-width:1px"/>
+    </svg>
+    <style>
+        .selected {
+            fill: red !important;
+        }
+        
+        .unselected {
+            fill: grey !important;
+        }
+        
+        .noselection {
+            fill: black !important;
+        }
+        
+        .otherselected {
+            fill: black !important;
+            r: 4 !important;
+        }
+    </style>
+<script>
+    //Put datascores in info variable for future use
+    var svgA3=d3.select("#A3")
+    var info=svgA3.selectAll("text").data(scores)
+    function clicked(event,d){
+        console.log(d.SATM)
+    }
+
+    //Put the dots on the graphA1
+     var svgA1=d3.select("#A1")
+     svgA1.call(
+             d3.brush()
+                .extent (
+                   [ [0,0],[300,200] ])
+                .on("end",updateChart))
+     var selection1 = svgA1.selectAll("circle")
+                           .data(scores)
+         selection1.enter().append("circle")
+        .attr("cx",function(d,i){return d.SATM/800*300})
+        .attr("cy", function(d,i){return 200-d.SATV/800*200})
+        .attr("r",function(d,i){return 2})
+        .style("fill",function(d,i){return "rgb(0,0,0)"})
+        .on("click",clicked)
+
+    
+    //Initial definition of selection1 are empty circles reselect all circles here
+    selection1 = svgA1.selectAll("circle")
+                      .data(scores)
+    
+    
+    //Create axis array and put them on the graph
+    //SATM-X axis
+    
+    var SATM_scale=d3.scaleLinear()
+                    .domain([0,800])
+                    .range([20,280]);
+    var x_axis = d3.axisBottom(SATM_scale);
+    svgA1.append("g")
+           .attr("transform", "translate(10,175)")
+           .call(x_axis)
+           
+    //SATV-Y axis
+    var SATV_scale=d3.scaleLinear()
+                    .domain([0,800])
+                    .range([180,20]);
+    var y_axis = d3.axisLeft(SATV_scale);
+    svgA1.append("g")
+        .attr("transform", "translate(30,-5)")
+        .call(y_axis)
+    
+    //Call Brush function
+    /*svgA1.call(
+            d3.brush()
+               .extent (
+                  [ [0,0],[300,200] ])
+               .on("end",updateChart))
+      */
+    //Function called when selection has completed
+    function updateChart(){
+        extent=d3.event.selection
+        if (!extent){
+            selection1.classed("noselection",true)
+            selection2.classed("otherselected",false)
+            svgA3.selectAll("text").remove()
+        }else{
+        selection1.classed("noselection", false)
+        selection1.classed("selected",function(d){
+            return isBrushed(extent,d.SATM/800*300,200-d.SATV/800*200)
+                                                 })
+        selection1.classed("unselected",function(d){
+            return !isBrushed(extent,d.SATM/800*300,200-d.SATV/800*200)
+                                                   })
+        selection2.classed("otherselected",function(d){
+            return isBrushed(extent,d.SATM/800*300,200-d.SATV/800*200)
+                                                   })
+        //reserved space for selection2
+        var n_lines=1
+        svgA3.selectAll("text").remove()
+        for (i=0;i<scores.length;i++){
+          if (isBrushed(extent,scores[i].SATM/800*300,200-scores[i].SATV/800*200)){
+              info.enter().append("text").text("SATM: "+scores[i].SATM+", SATV: "+scores[i].SATV+", ACT: "+scores[i].ACT+", GPA: "+scores[i].GPA)
+                  .attr("dy",n_lines+"em")
+                  .attr("font-size","8px")
+              n_lines = n_lines + 1
+
+              }
+          }
+        }
+   }
+    
+    //Determine if dots are in the selection or not
+    function isBrushed(brush_coords, cx, cy) {
+      var x0 = brush_coords[0][0],
+          x1 = brush_coords[1][0],
+          y0 = brush_coords[0][1],
+          y1 = brush_coords[1][1];
+     return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+   }
+
+    </script>
+                
+                
+ <script>
+        var svgA2=d3.select("#A2")
+        var selection2=svgA2.selectAll("circle")
+                            .data(scores)
+            selection2.enter().append("circle")
+            .attr("cx",function(d,i){return d.ACT/36*300})
+            .attr("cy", function(d,i){return 200-d.GPA/4*200})
+            .attr("r",function(d,i){return 2})
+            .style("fill",function(d,i){return "rgb(0,0,0)"})
+            
+         selection2=svgA2.selectAll("circle")
+                         .data(scores)
+        var ACT_scale=d3.scaleLinear()
+                         .domain([0,36])
+                         .range([20,280]);
+                                       
+        var x_axis = d3.axisBottom(ACT_scale);
+            svgA2.append("g")
+                .attr("transform", "translate(10,175)")
+                .call(x_axis)
+                                                                   
+        var GPA_scale=d3.scaleLinear()
+                         .domain([0,4])
+                         .range([180,20]);
+                                                           
+       var y_axis = d3.axisLeft(GPA_scale);
+            svgA2.append("g")
+                .attr("transform", "translate(30,-5)")
+                .call(y_axis)
+       
+       svgA2.call(d3.brush()
+                    .extent ([ [0,0],[300,200] ])
+                    .on("end",updateChart))
+
+    //Function called when selection has completed
+    function updateChart(){
+        extent=d3.event.selection
+        if (!extent){
+            selection2.classed("noselection",true)
+            selection1.classed("otherselected",false)
+            svgA3.selectAll("text").remove()
+        }else{
+            selection2.classed("noselection", false)
+            selection2.classed("selected",function(d){
+                        return isBrushed(extent,d.ACT/36*300,200-d.GPA/4*200)
+                                                             })
+            
+            selection2.classed("unselected",function(d){
+                        return !isBrushed(extent,d.ACT/36*300,200-d.GPA/4*200)
+                                                               })
+            selection1.classed("otherselected",function(d){
+                        return isBrushed(extent,d.ACT/36*300,200-d.GPA/4*200)
+                                                    })
+            var n_lines=1
+            svgA3.selectAll("text").remove()
+            for (i=0;i<scores.length;i++){
+                if(isBrushed(extent,scores[i].ACT/36*300,200-scores[i].GPA/4*200)){
+                    info.enter().append("text").text("SATM: "+scores[i].SATM+", SATV: "+scores[i].SATV+", ACT: "+scores[i].ACT+", GPA: "+scores[i].GPA)
+                    .attr("dy",n_lines+"em")
+                    .attr("font-size","8px")
+                    n_lines = n_lines + 1
+
+                }
+            }
+
+        }
+    }
+                
+    //Determine if dots are in the selection or not
+        function isBrushed(brush_coords, cx, cy) {
+                  var x0 = brush_coords[0][0],
+                      x1 = brush_coords[1][0],
+                      y0 = brush_coords[0][1],
+                      y1 = brush_coords[1][1];
+                 return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+               }
+
+</script>
+		 
+</div>
+
+
+
+</body>
+
+</html>

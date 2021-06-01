@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script>
+	
+	// Let's build something that looks like OOP
+	function createObject(content) {
+	    var result = {
+	        get: function() {
+	            return content;
+	        },
+	        set: function(newValue) {
+	            content = newValue;
+	        },
+	        twice: function() {
+	            return content * 2;
+	        }
+	    };
+	    return result;
+	}
+
+	f = createObject("something");
+	console.log("Get: " + f.get());
+	console.log("Twice: " + f.twice());
+	f.set(20);
+	console.log("Get: " + f.get());
+	console.log("Twice: " + f.twice());
+
+	// Inheritance, with no classes
+	base = {
+	    v1: 1,
+	    v2: 2
+	};
+
+	derived = {
+	    v1: 5,
+	    v3: 3,
+	    v4: 4
+	};
+
+	console.log("Base v1: " + base.v1);
+	console.log("Derived v1: " + derived.v1);
+	console.log("Derived v2: " + derived.v2);
+
+	// this calls sets the prototype of derived to be the base
+	Object.setPrototypeOf(derived, base);
+	console.log("Derived v1: " + derived.v1);
+	console.log("Derived v2: " + derived.v2);
+
+	// You can also use:
+	derived2  = Object.create(base);
+	derived2.v3 = 3; 
+	derived2.v4 = 4;
+
+
+
+
+	function otherObject(value) {
+	    return {
+	        x: value,
+			y: value*10,
+	        get: function () {
+	            return this.x;
+	        },
+	        set: function (newValue) {
+	            this.x = newValue;
+	        }
+	    };
+	}
+
+	other = otherObject(3);
+	console.log("other.x " +    other.x);
+	console.log("other.y " +    other.y);
+	console.log("other.get() " +other.get());
+	other.set(5);
+	other.y = 20;
+	console.log("other.x " +    other.x);
+	console.log("other.y " +    other.y);
+	console.log("other.get() " +other.get());
+
+</script>
+
+</body>
+</html>
